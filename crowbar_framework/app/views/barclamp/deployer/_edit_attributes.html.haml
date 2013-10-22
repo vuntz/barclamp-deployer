@@ -1,0 +1,8 @@
+%input#proposal_attributes{:type => "hidden", :name => "proposal_attributes", :value => @proposal.raw_data['attributes'][@proposal.barclamp].to_json}
+%p
+  %label{:for => "proposal_attributes"}= t('.attributes')
+  = link_to t('raw'), proposal_barclamp_path(:id => @proposal.name, :controller => @proposal.barclamp, :dep_raw => @dep_raw, :attr_raw => true), :style => "float: right;"
+
+%p
+  %label{ :for => :auto_allocate }= t('.auto_allocate')
+  = select_tag :auto_allocate, options_for_select([['true', 'true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["use_allocate"].to_s), :onchange => "update_value('use_allocate', 'use_allocate', 'boolean')"

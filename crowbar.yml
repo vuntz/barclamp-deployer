@@ -36,6 +36,7 @@ locale_additions:
       deployer:
         edit_attributes:
           attributes: Attributes
+          auto_allocate: Automatically allocate discovered nodes
         edit_deployment:
           deployment: Deployment
 

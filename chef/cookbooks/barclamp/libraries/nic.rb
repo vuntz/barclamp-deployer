@@ -614,7 +614,7 @@ class ::Nic
         # OVS likes to create links to devices that do not really exist.
         # Skip them.
         File.symlink?(link) &&
-          File.exists?(File.readlink(link))
+          File.exists?(File.expand_path(File.readlink(link), "#{@nicdir}/brif"))
       end.map{|i| ::Nic.new(i)}
     end
 

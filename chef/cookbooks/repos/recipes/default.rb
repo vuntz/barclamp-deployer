@@ -13,8 +13,6 @@
 # limitations under the License.
 #
 
-provisioners = search(:node, "roles:provisioner-server")
-provisioner = provisioners[0] if provisioners
 os_token="#{node[:platform]}-#{node[:platform_version]}"
 Chef::Log.info("Running on #{os_token}")
 
@@ -22,13 +20,10 @@ file "/tmp/.repo_update" do
   action :nothing
 end
 
-if provisioner and !CrowbarHelper.in_sledgehammer?(node)
-  web_port = provisioner["provisioner"]["web_port"]
-  address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(provisioner, "admin").address
-
+unless CrowbarHelper.in_sledgehammer?(node)
   case node["platform"]
   when "ubuntu","debian"
-    repositories = provisioner["provisioner"]["repositories"][os_token]
+    repositories = node["provisioner"]["repositories"][os_token]
     cookbook_file "/etc/apt/apt.conf.d/99-crowbar-no-auth" do
       source "apt.conf"
     end
@@ -80,8 +75,10 @@ if provisioner and !CrowbarHelper.in_sledgehammer?(node)
   end
 
   if node["platform"] != "suse" and node["platform"] != "windows"
+    provisioner_settings = CrowbarConfig.fetch("core", "provisioner")
+    provisioner_url = "#{provisioner_settings["web"]["protocol"]}://#{provisioner_settings["web"]["host"]}:#{provisioner_settings["web"]["port"]}"
     template "/etc/gemrc" do
-      variables(:admin_ip => address, :web_port => web_port)
+      variables(:source_url => provisioner_url)
       mode "0644"
     end
   end
